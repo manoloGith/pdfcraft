@@ -322,6 +322,8 @@ fn other_candidates() -> Vec<PathBuf> {
         unix_fonts(&[
             "truetype/noto/NotoSansArabic-Regular.ttf",
             "noto/NotoSansArabic-Regular.ttf",
+            // Android's Arabic face (found in /system/fonts by file name).
+            "noto/NotoNaskhArabic-Regular.ttf",
             "google-noto/NotoSansArabic-Regular.ttf",
             "truetype/dejavu/DejaVuSans.ttf",
             "TTF/DejaVuSans.ttf",
@@ -351,6 +353,8 @@ fn han_candidates(traditional: bool) -> Vec<PathBuf> {
             "truetype/droid/DroidSansFallbackFull.ttf",
             "google-droid-sans-fonts/DroidSansFallbackFull.ttf",
             "droid/DroidSansFallbackFull.ttf",
+            // Android's older CJK fallback (found in /system/fonts by file name).
+            "droid/DroidSansFallback.ttf",
             "truetype/arphic/uming.ttc",
             "arphic-uming/uming.ttc",
         ])
@@ -400,6 +404,9 @@ fn hangul_candidates() -> Vec<PathBuf> {
     }
 }
 
+/// Where Android keeps its system faces.
+const ANDROID_FONTS: &str = "/system/fonts";
+
 fn windows_fonts() -> PathBuf {
     let dir = std::env::var_os("WINDIR").or_else(|| std::env::var_os("SystemRoot")).map_or_else(|| PathBuf::from(r"C:\Windows"), PathBuf::from);
     dir.join("Fonts")
@@ -426,6 +433,18 @@ fn unix_fonts(files: &'static [&'static str]) -> Vec<PathBuf> {
 fn unix_candidates(files: &[&str], installed: &[PathBuf]) -> Vec<PathBuf> {
     let mut paths: Vec<_> =
         ["/usr/share/fonts", "/usr/local/share/fonts"].iter().flat_map(|dir| files.iter().map(move |f| Path::new(dir).join(f))).collect();
+    // DexPdfCraft fork: Android keeps every system face directly in /system/fonts, with no
+    // fontconfig. Look there for the same file names, in the same order.
+    if cfg!(target_os = "android") {
+        for file in files {
+            if let Some(name) = Path::new(file).file_name() {
+                let path = Path::new(ANDROID_FONTS).join(name);
+                if !paths.contains(&path) {
+                    paths.push(path);
+                }
+            }
+        }
+    }
     // Fontconfig may point into /nix/store or a user's font directory. Keep the existing
     // candidate names and their preference order; this does not select arbitrary fonts.
     for file in files {
@@ -472,6 +491,14 @@ mod tests {
         let mut expected = unix_candidates(&names, &[]);
         expected.extend([noto, dejavu]);
         assert_eq!(unix_candidates(&names, &installed), expected);
+    }
+
+    #[test]
+    fn android_looks_in_system_fonts_by_file_name_after_the_usual_places() {
+        let paths = unix_candidates(&["noto/NotoSansArabic-Regular.ttf"], &[]);
+        assert_eq!(paths.first(), Some(&PathBuf::from("/usr/share/fonts/noto/NotoSansArabic-Regular.ttf")));
+        let in_system = paths.contains(&PathBuf::from("/system/fonts/NotoSansArabic-Regular.ttf"));
+        assert_eq!(in_system, cfg!(target_os = "android"));
     }
 
     #[test]

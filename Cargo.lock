@@ -244,6 +244,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "arboard-android-shim"
+version = "3.6.0"
+dependencies = [
+ "arboard",
+ "log",
+]
+
+[[package]]
 name = "arrayref"
 version = "0.3.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4761,7 +4769,7 @@ version = "0.18.1"
 name = "pdfcraft-ui-egui"
 version = "0.18.1"
 dependencies = [
- "arboard",
+ "arboard-android-shim",
  "base64 0.23.1",
  "block2 0.6.2",
  "bytemuck",
@@ -4798,7 +4806,7 @@ dependencies = [
  "png 0.18.1",
  "pollster 1.0.1",
  "proptest",
- "rfd",
+ "rfd-android-shim",
  "rustix 1.1.5",
  "serde",
  "serde_json",
@@ -5712,6 +5720,14 @@ dependencies = [
  "wayland-protocols",
  "web-sys",
  "windows-sys 0.61.2",
+]
+
+[[package]]
+name = "rfd-android-shim"
+version = "0.17.0"
+dependencies = [
+ "log",
+ "rfd",
 ]
 
 [[package]]

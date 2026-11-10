@@ -65,6 +65,8 @@ pub use print_ui::{
 };
 pub use redact_ui::{HiddenDraft, PagesDraft as RedactPagesDraft, RedactPrefs, SearchDraft as RedactSearchDraft, SearchMode as RedactSearchMode};
 pub mod i18n;
+/// DexPdfCraft fork: an app that presents this interface under its own name.
+pub mod product;
 pub mod theme;
 pub mod viewer_prefs;
 mod widgets;

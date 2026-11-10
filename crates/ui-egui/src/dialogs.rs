@@ -1675,6 +1675,22 @@ fn dialog_about(ui: &mut egui::Ui, req: &mut Pending) -> bool {
         1 => crate::credits::contributors_ui(ui),
         2 => crate::credits::models_ui(ui),
         _ => {
+            // DexPdfCraft fork: an app built on this interface first, then PdfCraft as its base.
+            if let Some(product) = crate::product::get() {
+                ui.label(egui::RichText::new(product.name).font(theme::semibold(20.0)));
+                ui.label(crate::i18n::fmt(tl!("Version {v}"), &[("v", product.version)]));
+                ui.add_space(6.0);
+                for paragraph in product.about_in(crate::i18n::current().code()) {
+                    ui.label(paragraph);
+                    ui.add_space(4.0);
+                }
+                for (label, url) in &product.links {
+                    ui.hyperlink_to(label, url);
+                }
+                ui.add_space(10.0);
+                ui.separator();
+                ui.add_space(6.0);
+            }
             ui.horizontal(|ui| {
                 widgets::artcraft_mark(ui, 40.0);
                 ui.vertical(|ui| {

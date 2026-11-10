@@ -632,24 +632,17 @@ pub fn progress_notice(app: &PdfCraftApp, ctx: &egui::Context) -> bool {
     cancel
 }
 
-/// The ArtCraft wordmark (Storyteller's brand, docs/brand/; not open source), sized to `height`.
+/// Where upstream draws the ArtCraft wordmark. The ArtCraft name and logos (docs/brand/) are
+/// trademarks that forks and modified versions must remove (docs/brand/LICENSE-brand.txt), so
+/// this fork (DexPdfCraft) shows the program's name in plain text instead and embeds none of them.
 pub fn artcraft_logo(ui: &mut egui::Ui, height: f32) -> Response {
-    let dark = ui.visuals().dark_mode;
-    let (uri, bytes): (&str, &'static [u8]) = if dark {
-        ("bytes://artcraft-logo-white.svg", include_bytes!("../../../docs/brand/artcraft-logo-white.svg"))
-    } else {
-        ("bytes://artcraft-logo.svg", include_bytes!("../../../docs/brand/artcraft-logo.svg"))
-    };
-    ui.add(egui::Image::from_bytes(uri, bytes).max_height(height).alt_text("ArtCraft"))
+    ui.label(egui::RichText::new("PdfCraft").size(height * 0.8).strong())
 }
 
-/// The ArtCraft mark (brand blue, works on light and dark), `size` points square.
+/// Where upstream draws the ArtCraft mark: empty space of the same size in this fork (see
+/// [`artcraft_logo`]).
 pub fn artcraft_mark(ui: &mut egui::Ui, size: f32) -> Response {
-    ui.add(
-        egui::Image::from_bytes("bytes://artcraft-mark.svg", include_bytes!("../../../docs/brand/artcraft-mark.svg"))
-            .fit_to_exact_size(vec2(size, size))
-            .alt_text("ArtCraft"),
-    )
+    ui.allocate_response(vec2(size, size), egui::Sense::hover())
 }
 
 /// Buttons for every community link (`pdfcraft_engine::links`), Discord first and prominent.

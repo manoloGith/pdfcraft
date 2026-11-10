@@ -43,7 +43,6 @@ web-time = { workspace = true }
 # Hands rendered rasters to egui as its pixels, without copying; already in the tree through egui and wgpu.
 bytemuck = { version = "1", features = ["extern_crate_alloc"] }
 
-rfd = { workspace = true }
 png = "0.18"
 base64 = "0.23"
 # Unicode bidi paragraph segmentation for right-to-left comment wrapping; egui 0.37's epaint owns
@@ -53,12 +52,17 @@ unicode-bidi = "0.3"
 # that put fallback faces on the interface's baseline (#1676); the same skrifa egui uses.
 skrifa = "0.44"
 
+# DexPdfCraft fork: rfd and arboard have no Android backend. These two crates take their names:
+# elsewhere they re-export the real rfd and arboard, on Android they are answered by backends the
+# app installs (android/README.md).
+rfd = { package = "rfd-android-shim", path = "../../android/rfd-shim" }
+arboard = { package = "arboard-android-shim", path = "../../android/arboard-shim" }
+
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 craft-update = { workspace = true }
 # Control-channel tokens.
 getrandom = "0.4"
-# Create ▸ Clipboard (images; already in the tree through egui-winit).
-arboard = { version = "3.6", default-features = false, features = ["image-data"] }
+
 # Waits for native file pickers off the UI thread (already in the tree through wgpu).
 pollster = "1.0"
 
@@ -86,7 +90,7 @@ sys-locale = "0.3"
 winsafe = { version = "0.0.29", default-features = false, features = ["advapi", "user"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-rfd = { workspace = true, features = ["file-handle-inner"] }
+rfd = { package = "rfd-android-shim", path = "../../android/rfd-shim", features = ["file-handle-inner"] }
 wasm-bindgen-futures = "0.4"
 wasm-bindgen = "0.2"
 js-sys = "0.3"

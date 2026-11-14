@@ -15,6 +15,9 @@ pub struct Product {
     pub about: Vec<(&'static str, Vec<String>)>,
     /// Links shown under the text: (label, URL).
     pub links: Vec<(String, String)>,
+    /// Whether the title bar shows PdfCraft's Discord button. An app under its own name has no
+    /// PdfCraft community of its own to send people to from there (Help ▸ Discord stays).
+    pub discord_button: bool,
 }
 
 impl Product {
@@ -39,6 +42,11 @@ pub fn get() -> Option<&'static Product> {
     PRODUCT.get()
 }
 
+/// Whether the title bar shows the Discord button: yes, unless the product says otherwise.
+pub fn discord_button() -> bool {
+    get().is_none_or(|p| p.discord_button)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -50,6 +58,7 @@ mod tests {
             version: "1",
             about: vec![("en", vec!["Hello".into()]), ("es", vec!["Hola".into()])],
             links: Vec::new(),
+            discord_button: false,
         };
         assert_eq!(p.about_in("es"), ["Hola".to_owned()]);
         assert_eq!(p.about_in("ja"), ["Hello".to_owned()]);
